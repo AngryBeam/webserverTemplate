@@ -2,6 +2,7 @@ const express = require('express');
 const hbs = require('hbs'); // template engine for handlebar view for express
 const fs = require('fs');
 
+const port = process.env.PORT || 8000;
 var app = express();
 
 //set HBS partial (file template directory)
@@ -51,6 +52,6 @@ app.get('/about', (req,res) => {
 
 
 
-app.listen(8080, () => {
-    console.log('Server is up.');
+app.listen(port, () => {
+    console.log(`Server is up on port ${port}`);
 });
