@@ -1,18 +1,28 @@
+//Main module to setting up HTTP server
 const express = require('express');
-const hbs = require('hbs'); // template engine for handlebar view for express
+const hbs = require('hbs'); // it is middle ware template engine for handlebar view for express
 const fs = require('fs');
+var bodyParser = require('body-parser');
+
+//Mongoose DB Connect
+var {mongoose} = require('./libs/mongoose');
+//Mongoose Model
+var {Todo} = require('./models/todo');
+var {User} = require('./models/user');
+
 
 const port = process.env.PORT || 8000;
 var app = express();
-
+//====================================================================================
 //set HBS partial (file template directory)
 hbs.registerPartials(__dirname + '/views/partials'); 
 
 //set express view using HBS
-app.set('view engine', 'hbs');  
-app.set('views', __dirname + '/views');
+app.set('view engine', 'hbs');              // register the template engine
+app.set('views', __dirname + '/views');     // specify the views directory
 
 //app.use to set express use middileware
+app.use(bodyParser.json()); //Set express to use middleware body parser
 app.use(express.static(__dirname + '/public_html')); //set default web directory
 app.use((req, res, next) => {
     var now = new Date().toString();
