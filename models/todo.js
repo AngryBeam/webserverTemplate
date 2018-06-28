@@ -20,12 +20,25 @@ var Todo = mongoose.model('Todo', {
 module.exports = {Todo};
 
 
-// var otherTodo = new Todo({
-//   text: 'Something to do'
-// });
-//
-// otherTodo.save().then((doc) => {
-//   console.log(JSON.stringify(doc, undefined, 2));
-// }, (e) => {
-//   console.log('Unable to save', e);
-// });
+/* var otherTodo = new Todo({
+  text: 'Something to do'
+});
+
+otherTodo.save().then((doc) => {
+  console.log(JSON.stringify(doc, undefined, 2));
+}, (e) => {
+  console.log('Unable to save', e);
+});
+
+var ObjectID = require('mongodb');
+
+if(!ObjectID.isValid(id)){
+  res.status(404).send();
+}else{
+  Todo.findById(id).then((data) => {
+    res.status(404).send();
+  }).catch(e){
+    res.status(400).send();
+  }
+}
+*/

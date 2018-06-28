@@ -1,4 +1,5 @@
 //Main module to setting up HTTP server
+const _ = require('lodash');
 const express = require('express');
 const hbs = require('hbs'); // it is middle ware template engine for handlebar view for express
 const fs = require('fs');
