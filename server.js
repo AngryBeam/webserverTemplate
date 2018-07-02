@@ -1,16 +1,21 @@
+console.log(`Starting Server with`);
+
+require('./config/config');
 //Main module to setting up HTTP server
 const _ = require('lodash');
 const express = require('express');
 const hbs = require('hbs'); // it is middle ware template engine for handlebar view for express
 const fs = require('fs');
-var bodyParser = require('body-parser');
+const {ObjectID} = require('mongodb');
+//const bodyParser = require('body-parser');
 
 //Mongoose DB Connect
 var {mongoose} = require('./libs/mongoose');
 //Mongoose Model
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
-
+//Middleware 
+var {authenticate} = require('./libs/middleware/authentacate');
 
 const port = process.env.PORT || 8000;
 var app = express();
@@ -23,30 +28,30 @@ app.set('view engine', 'hbs');              // register the template engine
 app.set('views', __dirname + '/views');     // specify the views directory
 
 //app.use to set express use middileware
-app.use(bodyParser.json()); //Set express to use middleware body parser
+//app.use(bodyParser.json()); //Set express to use middleware body parser
+app.use(express.json());
 app.use(express.static(__dirname + '/public_html')); //set default web directory
+
+//Access Log
 app.use((req, res, next) => {
     var now = new Date().toString();
     var log = `${now}: ${req.method} ${req.url}`;
     console.log(log);
-    fs.appendFile('server.log', log + '\n', (e) => {
+    /* fs.appendFile(`./logs/${now}.log`, log + '\n', (e) => {
         if(e){ console.log('Unable to write server log: ' + e); }
-    });
+    }); */
     next();
 });
 /* app.use((req, res, next) => {
     res.render('maintenance.hbs');
 });
  */
-
 //====================================================================================
 hbs.registerHelper('getCurrentYear', () => {
     return new Date().getFullYear();
 })
-
-
 //====================================================================================
-app.get('/', (req,res) => {
+/* app.get('/', (req,res) => {
     //res.send('Hello');
     res.send({
         name: 'Andrew',
@@ -59,10 +64,28 @@ app.get('/about', (req,res) => {
     res.render('about.hbs', {
         pageTitle: 'Page Title About Page',
     });
-});
+}); */
+//====================================================================================
+app.post('/users/register', (req, res) => {
+    
+    var body = _.pick(req.body, ['email', 'password']);
+    var user = new User(body);
+  
+    user.save().then(() => {
+      return user.generateAuthToken();
+    }).then((token) => {
+      res.header('x-auth', token).send(user);
+    }).catch((e) => {
+      res.status(400).send(e);
+    })
+  });
 
+  app.get('/users/me', authenticate, (req, res) => {    //Using a middle ware for authenticate
+    console.log(`Req=> ${req.user}`);
+    res.send(req.user);
+  });
 
-
+  //====================================================================================
 app.listen(port, () => {
     console.log(`Server is up on port ${port}`);
 });
